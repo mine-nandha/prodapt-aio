@@ -20,7 +20,7 @@ export default function NavbarComponent() {
     cookieStore?.get("fullName") && (
       <Navbar fluid rounded>
         <NavbarBrand href={process.env.BASE_URL}>
-          <ProdaptLogo className="w-1/4" />
+          <ProdaptLogo className="w-[100px]" />
         </NavbarBrand>
         <div className="flex md:order-2">
           <Dropdown
@@ -43,11 +43,14 @@ export default function NavbarComponent() {
                 {cookieStore.get("email").value}
               </span>
             </DropdownHeader>
-            <DropdownItem>Dashboard</DropdownItem>
+            <DropdownItem>
+              <Link href={process.env.BASE_URL + "/profile"}>Profile</Link>
+            </DropdownItem>
             <DropdownItem>Settings</DropdownItem>
-            <DropdownItem>Earnings</DropdownItem>
             <DropdownDivider />
-            <DropdownItem>Sign out</DropdownItem>
+            <DropdownItem>
+              <a href={process.env.BASE_URL + "/logout"}>Sign out</a>
+            </DropdownItem>
           </Dropdown>
           <NavbarToggle />
         </div>
@@ -55,8 +58,8 @@ export default function NavbarComponent() {
           <Link href={process.env.BASE_URL}>
             <NavbarLink as="div">Home</NavbarLink>
           </Link>
-          <Link href={process.env.BASE_URL + "/profile"}>
-            <NavbarLink as="div">Profile</NavbarLink>
+          <Link href={process.env.BASE_URL + "/dashboard"}>
+            <NavbarLink as="div">Dashboard</NavbarLink>
           </Link>
           <Link href={process.env.BASE_URL + "/timesheet"}>
             <NavbarLink as="div">Timesheet</NavbarLink>
