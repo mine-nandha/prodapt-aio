@@ -1,4 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-  
+
+.rmdp-wrapper {
+  z-index: 20 !important;
+}

@@ -1,4 +1,4 @@
-import Calendar from "@/components/Calendar";
+import CalendarWrapper from "@/components/Calendar";
 import { GET } from "@/lib/utils";
 import { cookies } from "next/headers";
 
@@ -9,13 +9,15 @@ const TimeSheet = async () => {
   const taskId = data[0]?.compositeKey?.taskId;
   const projectId = data[0]?.compositeKey?.projectId;
   return (
-    <div className="flex flex-col text-center mt-3">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)]">
       <h1>Timesheet</h1>
       <div className="pt-3">
-        <Calendar
+        <CalendarWrapper
+          BASE_URL={process.env.BASE_URL}
+          CRON_URL={process.env.CRON_URL}
           empCode={empCode.value}
-          projectId={projectId}
           taskId={taskId}
+          projectId={projectId}
         />
       </div>
     </div>

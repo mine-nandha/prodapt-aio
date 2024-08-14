@@ -43,12 +43,12 @@ export default function NavbarComponent() {
                 {cookieStore.get("email").value}
               </span>
             </DropdownHeader>
-            <DropdownItem>
+            <DropdownItem as="div">
               <Link href={process.env.BASE_URL + "/profile"}>Profile</Link>
             </DropdownItem>
             <DropdownItem>Settings</DropdownItem>
             <DropdownDivider />
-            <DropdownItem>
+            <DropdownItem as="div">
               <a href={process.env.BASE_URL + "/logout"}>Sign out</a>
             </DropdownItem>
           </Dropdown>

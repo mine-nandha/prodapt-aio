@@ -15,15 +15,27 @@ export async function GET() {
 
 export async function POST(req) {
   try {
-    const { date, empCode, taskId, projectId } = await req.json();
-    for (const day of date) {
-      await saveAndSubmitDay(day, empCode, taskId, projectId);
+    const { selectedDates, empCode, taskId, projectId } = await req.json();
+    const failedDates = [...selectedDates];
+    for (const day of selectedDates) {
+      if (await saveAndSubmitDay(day, empCode, taskId, projectId)) {
+        failedDates.splice(failedDates.indexOf(day), 1);
+      }
     }
 
-    return new Response(JSON.stringify({ message: `Booked` }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        message:
+          failedDates.length === 0
+            ? `Booked`
+            : `Failed to book for the following dates ${failedDates.toString()}`,
+        failedDates: failedDates,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (e) {
     console.log(e);
     return new Response(JSON.stringify({ error: e }), {
@@ -34,7 +46,7 @@ export async function POST(req) {
 }
 
 const maxRetries = 3;
-async function saveAndSubmitDay(day, empCode, taskId, projectId) {
+export async function saveAndSubmitDay(day, empCode, taskId, projectId) {
   let saveOk = false;
   let retries = 0;
 
@@ -85,5 +97,8 @@ async function saveAndSubmitDay(day, empCode, taskId, projectId) {
     console.log(
       `Failed to save and submit for ${day} after ${maxRetries} retries.`
     );
+    return false;
+  } else {
+    return true;
   }
 }
