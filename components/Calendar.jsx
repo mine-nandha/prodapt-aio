@@ -84,7 +84,6 @@ const CalendarWrapper = ({
         }
       }
     });
-
     const res = await fetch(`/api/timesheet/save`, {
       method: "POST",
       body: JSON.stringify({
@@ -97,6 +96,7 @@ const CalendarWrapper = ({
         "Content-Type": "application/json",
       },
     });
+    console.log(selectedDates);
     const { message, failedDates } = await res.json();
     console.log(message);
     if (failedDates && failedDates.length > 0) {
@@ -303,12 +303,12 @@ const CalendarWrapper = ({
                           Are you absolutely sure?
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                          After booking a bunch of dates for this month, you'll
-                          have a task added to your dashboard. That task will be
-                          excecuted on all the days that you've booked for. You
-                          will get a mail if a scheduled task on one of the days
-                          fails. You can try booking again. If still fails,
-                          contact the{" "}
+                          After booking a bunch of dates for this month,
+                          you&apos;ll have a task added to your dashboard. That
+                          task will be excecuted on all the days that
+                          you&apos;ve booked for. You will get a mail if a
+                          scheduled task on one of the days fails. You can try
+                          booking again. If still fails, contact the{" "}
                           <a
                             href="mailto:nandhakishore.s@prodapt.com"
                             className="text-blue-600"
