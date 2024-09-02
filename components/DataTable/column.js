@@ -38,7 +38,9 @@ export const columns = [
     accessorKey: "scheduledDate",
     header: "Scheduled Date",
     cell: ({ row }) => (
-      <div className="text-left">{row.getValue("scheduledDate")}</div>
+      <div className="text-left">
+        {row.getValue("scheduledDate").split("T")[0]}
+      </div>
     ),
   },
   {
@@ -83,7 +85,13 @@ export const columns = [
               Copy ticket ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={async () => {
+                console.log(JSON.stringify(task));
+              }}
+            >
+              Retry
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

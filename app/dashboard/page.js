@@ -6,6 +6,9 @@ const cronParser = require("cron-parser");
 const getData = async (empCode) => {
   const res = await fetch(`${process.env.CRON_URL}/tasks/${empCode}`);
   const tasks = await res.json();
+  if (tasks.error && tasks.error === 404) {
+    return tasks;
+  }
   const now = new Date();
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
@@ -44,7 +47,7 @@ const getData = async (empCode) => {
         ) {
           const status = log.response.status === 200 ? "success" : "failed";
           const ticketId =
-            log.response.status === 200 ? log.response.body.ticketId : null;
+            log.response.status === 200 ? log.response.body.ticketId : "NA";
 
           result.push({
             id: task.id,
@@ -65,13 +68,16 @@ const getData = async (empCode) => {
     ticketId: task.ticketId,
     status: task.status,
     task: task.task,
-    scheduledDate: task.scheduledAt.toISOString().split("T")[0],
+    scheduledDate: task.scheduledAt.toISOString().slice(0, 16),
   }));
 };
 
 const Dashboard = async () => {
   const empCode = cookies().get("empCode");
   const data = await getData(empCode.value);
+  if (data.error && data.error === 404) {
+    return <h1>No tasks found</h1>;
+  }
   return (
     <div>
       <h1 className="text-center mt-4">Dashboard</h1>

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Calendar } from "react-multi-date-picker";
 import "react-multi-date-picker/styles/colors/red.css";
 import { Button } from "./ui/button";
-import { timesheet } from "@/lib/utils";
+import { saveFutureTimesheet, saveTimesheet, timesheet } from "@/lib/utils";
 import { Tabs } from "flowbite-react";
 import { HiUserCircle } from "react-icons/hi";
 import { MdDashboard } from "react-icons/md";
@@ -84,25 +84,13 @@ const CalendarWrapper = ({
         }
       }
     });
-    const res = await fetch(`/api/timesheet/save`, {
-      method: "POST",
-      body: JSON.stringify({
-        selectedDates: selectedDates,
-        empCode: empCode,
-        taskId: taskId,
-        projectId: projectId,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    console.log(selectedDates);
+    const res = await saveTimesheet(selectedDates, empCode, taskId, projectId);
     const { message, failedDates } = await res.json();
     console.log(message);
     if (failedDates && failedDates.length > 0) {
       console.log(failedDates);
     } else {
-      setValue(null);
+      handleValueChange(null);
     }
     const data = await timesheet(empCode, selectedDates);
     setBookedDates(data.bookedDates);
@@ -119,40 +107,35 @@ const CalendarWrapper = ({
     futureValue.forEach((range) => {
       if (!range[1]) {
         selectedFutureDates.push(range[0].toString());
-        days.push(new Date(range[0]).getDate().toString());
+        days.push(new Date(range[0]).getUTCDate());
       } else {
         let start = new Date(range[0]);
         let end = new Date(range[1]);
         for (
           let date = new Date(start);
           date <= end;
-          date.setDate(date.getDate() + 1)
+          date.setUTCDate(date.getUTCDate() + 1)
         ) {
           selectedFutureDates.push(date.toISOString().split("T")[0]);
         }
-        if (start.getDate() === end.getDate()) {
-          days.push(start.getDate().toString());
+        if (start.getUTCDate() === end.getUTCDate()) {
+          days.push(start.getUTCDate());
         } else {
-          days.push(`${start.getDate()}-${end.getDate()}`);
+          days.push(`${start.getUTCDate()}-${end.getUTCDate()}`);
         }
       }
     });
-    cron = `0 0 ${days.toString()} ${new Date().getMonth() + 1} *`;
-    const res = await fetch(`${CRON_URL}/tasks`, {
-      method: "POST",
-      body: JSON.stringify({
-        url: `${BASE_URL}/api/cronjob/taskId`,
-        method: "GET",
-        name: "Timesheet",
-        cron: cron,
-        creator: empCode,
-        projectId: projectId,
-        taskId: taskId,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).catch((e) => console.error(e));
+    cron = `${Math.floor(Math.random() * 50) + 10} 0 ${days.toString()} ${
+      new Date().getUTCMonth() + 1
+    } *`;
+    const res = await saveFutureTimesheet(
+      CRON_URL,
+      BASE_URL,
+      cron,
+      empCode,
+      projectId,
+      taskId
+    );
 
     if (alertDialogRef.current) {
       alertDialogRef.current.click();
