@@ -14,7 +14,7 @@ const getData = async (empCode) => {
 
   const result = [];
   //Future executions
-  tasks.forEach((task) => {
+  for (const task of tasks) {
     const interval = cronParser.parseExpression(task.cron, {
       currentDate: now,
     });
@@ -35,19 +35,23 @@ const getData = async (empCode) => {
       }
     }
     //Past executions
-    if (task.logs && task.logs.length > 0) {
+    const logs = await (
+      await fetch(`${process.env.CRON_URL}/task/${task.id}/logs`)
+    ).json();
+    if (logs && logs.length > 0) {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
-      task.logs.forEach((log) => {
-        const executedAt = new Date(log.executedAt);
+      for (const log of logs) {
+        const executedAt = new Date(log.response.date);
         if (
           executedAt.getDate() >= yesterday.getDate() &&
           executedAt.getMonth() === yesterday.getMonth() &&
           executedAt.getFullYear() === yesterday.getFullYear()
         ) {
+          console.log(executedAt);
           const status = log.response.status === 200 ? "success" : "failed";
           const ticketId =
-            log.response.status === 200 ? log.response.body.ticketId : "NA";
+            log.response.status === 200 ? log.response.ticketId : "NA";
 
           result.push({
             id: task.id,
@@ -57,12 +61,11 @@ const getData = async (empCode) => {
             scheduledAt: executedAt,
           });
         }
-      });
+      }
     }
-  });
+  }
 
   result.sort((a, b) => a.scheduledAt - b.scheduledAt);
-
   return result.map((task) => ({
     id: task.id,
     ticketId: task.ticketId,

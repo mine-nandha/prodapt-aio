@@ -21,6 +21,7 @@ export async function POST(req, { params }) {
           status: 200,
           message: "Success",
           date: new Date().toISOString().split("T")[0],
+          ticketId: "NA",
         },
       });
     } else {
@@ -32,7 +33,7 @@ export async function POST(req, { params }) {
         },
       });
     }
-    return new Response(null);
+    return new Response({ message: "Success" });
   } catch (e) {
     await createLog(process.env.CRON_URL, id, {
       response: {
