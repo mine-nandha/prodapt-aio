@@ -5,6 +5,17 @@ import { deleteOtp, store } from "@/lib/store";
 import { GET } from "@/lib/utils";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+export async function setCookie(key, value) {
+  cookies().set({
+    name: key,
+    value: value,
+    path: "/",
+    httpOnly: true,
+    secure: true,
+    maxAge: 60 * 60 * 24 * 7,
+    sameSite: "strict",
+  });
+}
 
 export const handleOtp = async (FormData) => {
   const email = FormData.get("email");
@@ -23,42 +34,10 @@ export const handleOtp = async (FormData) => {
       const { employeeId, employeeCode, fullName } = detailByUsername;
       console.log("Cookies set");
       const baseUrl = process.env.BASE_URL || "http://localhost:3000";
-      cookies().set({
-        name: "empCode",
-        value: employeeCode,
-        path: "/",
-        httpOnly: true,
-        secure: true,
-        maxAge: 60 * 60 * 24 * 7,
-        sameSite: "strict",
-      });
-      cookies().set({
-        name: "password",
-        value: employeeId,
-        path: "/",
-        httpOnly: true,
-        secure: true,
-        maxAge: 60 * 60 * 24 * 7,
-        sameSite: "strict",
-      });
-      cookies().set({
-        name: "email",
-        value: email,
-        path: "/",
-        httpOnly: true,
-        secure: true,
-        maxAge: 60 * 60 * 24 * 7,
-        sameSite: "strict",
-      });
-      cookies().set({
-        name: "fullName",
-        value: fullName,
-        path: "/",
-        httpOnly: true,
-        secure: true,
-        maxAge: 60 * 60 * 24 * 7,
-        sameSite: "strict",
-      });
+      setCookie("empCode", employeeCode);
+      setCookie("password", employeeId);
+      setCookie("email", email);
+      setCookie("fullName", fullName);
       redirect(`${baseUrl}/profile`);
     } else {
       console.log("Invalid OTP");

@@ -1,7 +1,7 @@
 import { columns } from "@/components/DataTable/column";
 import { DataTable } from "@/components/DataTable/DataTable";
 import { cookies } from "next/headers";
-const cronParser = require("cron-parser");
+import { parseExpression } from "cron-parser";
 
 const getData = async (empCode) => {
   const res = await fetch(`${process.env.CRON_URL}/tasks/${empCode}`);
@@ -15,7 +15,7 @@ const getData = async (empCode) => {
   const result = [];
   //Future executions
   for (const task of tasks) {
-    const interval = cronParser.parseExpression(task.cron, {
+    const interval = parseExpression(task.cron, {
       currentDate: now,
     });
     while (true) {
@@ -48,7 +48,6 @@ const getData = async (empCode) => {
           executedAt.getMonth() === yesterday.getMonth() &&
           executedAt.getFullYear() === yesterday.getFullYear()
         ) {
-          console.log(executedAt);
           const status = log.response.status === 200 ? "success" : "failed";
           const ticketId =
             log.response.status === 200 ? log.response.ticketId : "NA";
